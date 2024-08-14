@@ -8,8 +8,7 @@ const drawerWidth = 240;
 function Main({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(true);
-  const token = localStorage.getItem('Bearer ');
-  console.log(token)
+  
   const handleDrawerToggleMobile = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -75,8 +74,8 @@ function Main({ children }) {
           m: 0,
           transition: "margin-left 0.3s, width 0.3s ease",
           marginLeft: { sm: 0 },
-          backgroundColor: "#f7f9fc",
-          height: "100vh",
+          backgroundColor: "white",
+          height: "100%",
           width: { sm: desktopOpen ? `calc(100% - ${drawerWidth}px)` : "100%" },
         }}
       >
