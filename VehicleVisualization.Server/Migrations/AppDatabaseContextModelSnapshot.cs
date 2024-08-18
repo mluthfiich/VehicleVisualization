@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using VehicleVisualization.Server.Data;
 
-#nullable disable
-
 namespace VehicleVisualization.Server.Migrations
 {
     [DbContext(typeof(AppDatabaseContext))]
@@ -333,7 +331,6 @@ namespace VehicleVisualization.Server.Migrations
 
                     b.Navigation("NavigationMenu");
                 });
-#pragma warning restore 612, 618
         }
     }
 }

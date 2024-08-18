@@ -3,8 +3,10 @@ import Login from "../views/login/index";
 import Main from "../components/main/main";
 import AuthRouted from "../services/authRouted";
 import Unauthorized from "../views/Unauthorized";
-import Analytic from "../views/analytic";
-import DataVehicle from "../views/dataVehicle";
+import Analytic from "../views/dashboard/analytic";
+import DataVehicle from "../views/dashboard/dataVehicle";
+import UserManagement from "../views/management/user";
+import MenuManagement from "../views/management/menu";
 
 function Router() {
   return (
@@ -20,6 +22,8 @@ function Router() {
               <Route path="/home" element={<Main />} />
               <Route path="/Analytic" element={<Analytic />} />
               <Route path="/DataVehicle" element={<DataVehicle />} />
+              <Route path="/UserManagement" element={<UserManagement />} />
+              <Route path="/MenuPermission" element={<MenuManagement />} />
             </Routes>
           </AuthRouted>
         }

@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
-
 namespace VehicleVisualization.Server.Migrations
 {
     public partial class first : Migration

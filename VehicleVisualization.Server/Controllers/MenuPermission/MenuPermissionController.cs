@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using VehicleVisualization.Server.Model.Request;
 using VehicleVisualization.Server.Repositories.MenuPermission;
 
 namespace VehicleVisualization.Server.Controllers.MenuPermission
@@ -29,5 +30,50 @@ namespace VehicleVisualization.Server.Controllers.MenuPermission
 
             return Ok(menuItems);
         }
-    }
+
+		[HttpGet("ListMenu")]
+		[Authorize]
+		public async Task<IActionResult> GetListRole()
+		{
+			var listMenu = await _menuPermissionService.GetListMenu();
+
+			return Ok(listMenu);
+		}
+
+		[HttpGet("ListRoleMenu")]
+		[Authorize]
+		public async Task<IActionResult> GetListRoleMenu()
+		{
+			var listRoleMenu = await _menuPermissionService.GetDataRoleMenu();
+
+			return Ok(listRoleMenu);
+		}
+
+		[HttpPost("AddMenuPermission")]
+		[Authorize]
+		public async Task<IActionResult> AddMenuPermission([FromBody] MenuPermissionRequestModel model)
+		{
+			var result = await _menuPermissionService.AddMenuPermission(model);
+
+			return Ok(result);
+		}
+
+		[HttpDelete("DeleteMenuPermission")]
+		[Authorize]
+		public async Task<IActionResult> DeleteMenuPermission([FromBody] string RoleMenuId)
+		{
+			var result = await _menuPermissionService.DeleteMenuPermission(RoleMenuId);
+
+			return Ok(result);
+		}
+
+		[HttpPut("UpdateMenuPermission")]
+		[Authorize]
+		public async Task<IActionResult> UpdateMenuPermission([FromBody] UpdateMenuPermissionModel model)
+		{
+			var result = await _menuPermissionService.UpdateMenuPermission(model);
+
+			return Ok(result);
+		}
+	}
 }

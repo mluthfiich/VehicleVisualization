@@ -1,11 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using VehicleVisualization.Server.Data;
 using VehicleVisualization.Server.Model.Auth;
+using VehicleVisualization.Server.Model.Management;
 using VehicleVisualization.Server.Repositories.MenuPermission;
+using VehicleVisualization.Server.Repositories.Redis;
 
 namespace VehicleVisualization.Server.Repositories.Auth
 {
@@ -15,16 +20,21 @@ namespace VehicleVisualization.Server.Repositories.Auth
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly IMenuPermissionService _menuPermissionService;
+		private readonly AppDatabaseContext _context;
+		private readonly IRedisCacheService _redisCacheService;
 
-        public AuthService(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, IMenuPermissionService menuPermissionService)
+		public AuthService(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, IMenuPermissionService menuPermissionService, AppDatabaseContext context, IRedisCacheService redisCacheService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _menuPermissionService = menuPermissionService;
+			_context = context;
+			_redisCacheService = redisCacheService;
         }
 
-        public async Task<IActionResult> Register(RegisterModel model)
+		[Authorize]
+		public async Task<IActionResult> Register(RegisterModel model)
         {
             var user = new IdentityUser { UserName = model.Username, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -95,6 +105,7 @@ namespace VehicleVisualization.Server.Repositories.Auth
 			return new OkObjectResult(new
 			{
 				token = newJwtToken,
+				expired = DateTime.Now.AddMinutes(double.Parse(_configuration["Jwt:ExpiryMinutes"])),
 				refreshToken = newRefreshToken
 			});
 		}
@@ -144,6 +155,7 @@ namespace VehicleVisualization.Server.Repositories.Auth
 			}
 		}
 
+		[Authorize]
 		public async Task<IActionResult> AddRole(string role)
         {
             if (!await _roleManager.RoleExistsAsync(role))
@@ -160,7 +172,8 @@ namespace VehicleVisualization.Server.Repositories.Auth
             return new BadRequestObjectResult("Role already exists");
         }
 
-        public async Task<IActionResult> AssignRole(UserRoleModel model)
+		[Authorize]
+		public async Task<IActionResult> AssignRole(UserRoleModel model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
             if (user == null)
@@ -175,6 +188,65 @@ namespace VehicleVisualization.Server.Repositories.Auth
             }
 
             return new BadRequestObjectResult(result.Errors);
-        }
-    }
+		}
+
+		[Authorize]
+		public async Task<List<UserManagementModel>> GetListUserRole()
+		{
+			var listUser = await _context.UserManagements
+				.FromSqlInterpolated($"EXEC spGetDataUserRole")
+				.AsNoTracking()
+				.ToListAsync();
+
+			return listUser;
+		}
+
+		[Authorize]
+		public async Task<List<RoleModel>> GetListRole()
+		{
+			var listRoles = await _context.Roles
+				.FromSqlInterpolated($"EXEC spGetDataRole")
+				.AsNoTracking()
+				.ToListAsync();
+
+			return listRoles;
+		}
+
+		[Authorize]
+		public async Task<List<UserModel>> GetListUser()
+		{
+			var listUsers = await _context.Users
+				.FromSqlInterpolated($"EXEC spGetDataUser")
+				.AsNoTracking()
+				.ToListAsync();
+
+			return listUsers;
+		}
+
+		public async Task<IActionResult> DeleteAccount(UserRoleModel model)
+		{
+			try
+			{
+				var result = await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC spDeleteDataUser {model.Username}, {model.Role}");
+				return new OkObjectResult(new { message = "Menu Permission deleted successfully" });
+			}
+			catch (Exception ex)
+			{
+				return new BadRequestObjectResult(ex);
+			}
+		}
+
+		public async Task<IActionResult> UpdateAccount(UserRoleModel model)
+		{
+			try
+			{
+				var result = await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC spUpdateDataUserRole {model.Username}, {model.Role}");
+				return new OkObjectResult(new { message = "Menu Permission deleted successfully" });
+			}
+			catch (Exception ex)
+			{
+				return new BadRequestObjectResult(ex);
+			}
+		}
+	}
 }

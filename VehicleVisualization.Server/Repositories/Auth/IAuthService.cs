@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VehicleVisualization.Server.Model.Auth;
+using VehicleVisualization.Server.Model.Management;
 
 namespace VehicleVisualization.Server.Repositories.Auth
 {
@@ -10,5 +11,10 @@ namespace VehicleVisualization.Server.Repositories.Auth
         Task<IActionResult> AddRole(string role);
         Task<IActionResult> AssignRole(UserRoleModel model);
 		Task<IActionResult> RefreshToken(string token, string refreshToken);
+		Task<List<UserModel>> GetListUser();
+		Task<List<RoleModel>> GetListRole();
+		Task<List<UserManagementModel>> GetListUserRole();
+		Task<IActionResult> DeleteAccount(UserRoleModel model);
+		Task<IActionResult> UpdateAccount(UserRoleModel model);
 	}
 }

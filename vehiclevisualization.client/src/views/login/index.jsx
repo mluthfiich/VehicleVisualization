@@ -4,7 +4,8 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import "./login.css";
 import { useNavigate } from 'react-router-dom';
-import interceptToken, { startAutoRefresh } from '../../services/interceptToken';
+// import interceptToken, { startAutoRefresh } from '../../services/interceptToken';
+import axios from "axios";
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -27,14 +28,14 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const response = await interceptToken.post('/Auth/Login', { username, password });
+            const response = await axios.post('/api/Auth/Login', { username, password });
     
             const data = response.data;
             const { token, refreshToken } = data;
             localStorage.setItem('Bearer ', token);
-            localStorage.setItem('RefreshToken', refreshToken);
+            localStorage.setItem('RefreshToken', token);
     
-            startAutoRefresh(refreshToken);
+            // startAutoRefresh(refreshToken);
 
             navigate('/Home');
         } catch (err) {

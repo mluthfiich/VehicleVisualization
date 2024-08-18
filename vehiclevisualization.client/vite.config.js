@@ -1,5 +1,4 @@
 import { fileURLToPath, URL } from "node:url";
-
 import { defineConfig } from "vite";
 import plugin from "@vitejs/plugin-react";
 import fs from "fs";
@@ -60,7 +59,59 @@ export default defineConfig({
         target,
         secure: false,
       },
+      "^/api/Auth/Register": {
+        target,
+        secure: false,
+      },
+      "^/api/Auth/AddRole": {
+        target,
+        secure: false,
+      },
+      "^/api/Auth/AssignRole": {
+        target,
+        secure: false,
+      },
+      "^/api/Auth/ListUser": {
+        target,
+        secure: false,
+      },
+      "^/api/Auth/ListRole": {
+        target,
+        secure: false,
+      },
+      "^/api/Auth/ListUserRole": {
+        target,
+        secure: false,
+      },
+      "^/api/Auth/DeleteUserRole": {
+        target,
+        secure: false,
+      },
+      "^/api/Auth/UpdateUserRole": {
+        target,
+        secure: false,
+      },
       "^/api/MenuPermission/Permission": {
+        target,
+        secure: false,
+      },
+      "^/api/MenuPermission/ListMenu": {
+        target,
+        secure: false,
+      },
+      "^/api/MenuPermission/ListRoleMenu": {
+        target,
+        secure: false,
+      },
+      "^/api/MenuPermission/AddMenuPermission": {
+        target,
+        secure: false,
+      },
+      "^/api/MenuPermission/DeleteMenuPermission": {
+        target,
+        secure: false,
+      },
+      "^/api/MenuPermission/UpdateMenuPermission": {
         target,
         secure: false,
       },

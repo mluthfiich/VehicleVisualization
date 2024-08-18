@@ -1,13 +1,12 @@
-import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
+import React from "react";
+import { Card, CardContent } from "@mui/material";
 
-export default function MediaCard({ children, maxWidthValue }) {
+const CardComponent = ({ children }) => {
   return (
-    <Card sx={{ maxWidth: maxWidthValue }}>
-      <CardContent>
-        {children}
-      </CardContent>
+    <Card sx={{ maxWidth: "100%" }}>
+      <CardContent>{children}</CardContent>
     </Card>
   );
-}
+};
+
+export default CardComponent;

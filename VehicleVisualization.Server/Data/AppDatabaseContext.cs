@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using VehicleVisualization.Server.Model.Auth;
 using VehicleVisualization.Server.Model.Vehicle;
+using VehicleVisualization.Server.Model.Management;
 
 namespace VehicleVisualization.Server.Data
 {
@@ -15,8 +16,13 @@ namespace VehicleVisualization.Server.Data
         public DbSet<RoleMenuPermissionModel> RoleMenuPermissions { get; set; }
         public DbSet<VehicleUnitModel> VehicleUnits { get; set; }
         public DbSet<VehicleUnitGrowthYoYModel> VehicleUnitGrowthYoYs { get; set; }
+		public DbSet<MenuManagementModel> MenuManagements { get; set; }
+		public DbSet<UserManagementModel> UserManagements { get; set; }
+		public DbSet<UserModel> Users { get; set; }
+		public DbSet<RoleModel> Roles { get; set; }
+		public DbSet<MenuModel> Menus { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<IdentityUser>().ToTable("TB_M_USER");

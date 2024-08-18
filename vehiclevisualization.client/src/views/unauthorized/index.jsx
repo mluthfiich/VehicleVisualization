@@ -11,6 +11,7 @@ const Unauthorized = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("Bearer ");
+    localStorage.removeItem("RefreshToken");
     navigate("/login");
   };
 

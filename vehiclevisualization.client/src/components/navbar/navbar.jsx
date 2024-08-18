@@ -38,6 +38,7 @@ const Navbar = ({
 
   const handleLogout = () => {
     localStorage.removeItem("Bearer ");
+    localStorage.removeItem("RefreshToken");
     navigate("/login");
   };
 

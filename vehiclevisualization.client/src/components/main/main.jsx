@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Box, CssBaseline, Drawer, Toolbar } from "@mui/material";
 import Navbar from "../navbar/navbar";
 import Sidebar from "../sidebar/sidebar";
+// import useInactivityTimeout from '../../services/useInactivityTimeout';
 
 const drawerWidth = 240;
 
 function Main({ children }) {
+  // useInactivityTimeout(1 * 60 * 60 * 1000);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(true);
   
@@ -74,8 +76,8 @@ function Main({ children }) {
           m: 0,
           transition: "margin-left 0.3s, width 0.3s ease",
           marginLeft: { sm: 0 },
-          backgroundColor: "white",
-          height: "100%",
+          backgroundColor: "#f7f9fc",
+          height: "100vh",
           width: { sm: desktopOpen ? `calc(100% - ${drawerWidth}px)` : "100%" },
         }}
       >
