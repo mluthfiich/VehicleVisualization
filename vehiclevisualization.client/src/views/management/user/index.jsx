@@ -19,6 +19,8 @@ import ModalComponent from "../../../components/modal/modal";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AlertComponent from "../../../components/alert/alert";
+import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 
 const UserManagement = () => {
   const [rows, setRows] = useState([]);
@@ -29,20 +31,24 @@ const UserManagement = () => {
   const [openModalAccount, setOpenModalAccount] = useState(false);
   const [openModalUser, setOpenModalUser] = useState(false);
   const [openModalRole, setOpenModalRole] = useState(false);
+  const [openModalChangeRole, setOpenModalChangeRole] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     userName: "",
     email: "",
     password: "",
-    role: "",
+    role: ""
   });
   const [error, setError] = useState({
     passwordError: false,
   });
-  const handleClickShowPassword = () => setShowPassword(!showPassword);
-  const handleMouseDownPassword = (e) => e.preventDefault();
   const [roles, setRoles] = useState([]);
   const [users, setUsers] = useState([]);
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedRoleId, setSelectedRoleId] = useState(null);
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+  const handleMouseDownPassword = (e) => e.preventDefault();
 
   const columns = [
     { id: "number", label: "No", width: "5%" },
@@ -53,12 +59,6 @@ const UserManagement = () => {
       id: "action",
       label: "Action",
       width: "10%",
-      render: (row) => (
-        <ButtonComponent mainColor="#e53935" backColor="#ef5350">
-          <DeleteIcon sx={{ mr: 0.5 }} />
-          Delete
-        </ButtonComponent>
-      ),
     },
   ];
 
@@ -152,6 +152,16 @@ const UserManagement = () => {
     setOpenModalRole(false);
   };
 
+  const handleOpenModalChangeRole = (userId) => {
+    setSelectedUserId(userId);
+    setOpenModalChangeRole(true);
+  };
+
+  const handleCloseModalChangeRole = () => {   
+    setSelectedUserId(null)
+    setOpenModalChangeRole(false);
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
@@ -174,6 +184,7 @@ const UserManagement = () => {
         }
       )
       .then((response) => {
+        fetchUserList();
         setOpenModalUser(false);
       })
       .catch((error) => {
@@ -195,6 +206,7 @@ const UserManagement = () => {
         }
       )
       .then((response) => {
+        fetchUserList();
         setOpenModalRole(false);
       })
       .catch((error) => {
@@ -207,7 +219,6 @@ const UserManagement = () => {
 
   const handleSubmitAccount = () => {
     const token = localStorage.getItem("Bearer ");
-
     axios
       .post(
         "/api/Auth/AssignRole",
@@ -227,6 +238,75 @@ const UserManagement = () => {
       })
       .catch((error) => {
         console.error("Error assigning role:", error);
+      });
+  };
+
+  const handleSubmitChangeRole = () => {
+    const token = localStorage.getItem("Bearer ");
+    axios
+      .put(
+        "/api/Auth/UpdateUserRole",
+        {
+          username: selectedUserId,
+          role: formData.role 
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        fetchUserList();
+        setOpenModalChangeRole(false);
+      })
+      .catch((error) => {
+        console.error(
+          "Error adding role:",
+          error.response ? error.response.data : error.message
+        );
+      });
+  };
+
+  const handleOpenConfirmDialog = (userId, roleId) => {
+    setSelectedUserId(userId);
+    setSelectedRoleId(roleId);
+    setOpenConfirmDialog(true);
+  };
+
+  const handleCloseConfirmDialog = () => {
+    setOpenConfirmDialog(false);
+    setSelectedUserId(null);
+    setSelectedRoleId(null);
+  };
+
+  const handleConfirmDelete = () => {
+    const token = localStorage.getItem("Bearer ");
+    axios
+      .delete("/api/Auth/DeleteUserRole", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          username: selectedUserId,
+          role: selectedRoleId,
+        },
+      })
+      .then(() => {
+        fetchUserList();
+        setRows(
+          rows.filter(
+            (row) =>
+              row.userId !== selectedUserId || row.roleId !== selectedRoleId
+          )
+        );
+        handleCloseConfirmDialog();
+      })
+      .catch((error) => {
+        console.error("Error deleting item:", error);
+        handleCloseConfirmDialog();
       });
   };
 
@@ -262,7 +342,32 @@ const UserManagement = () => {
           </ButtonComponent>
           <TableComponent
             columns={columns}
-            rows={rows}
+            rows={rows.map((row) => ({
+              ...row,
+              action: (
+                <Box>
+                  <ButtonComponent
+                    mainColor="#3949ab"
+                    backColor="#3f51b5"
+                    onClick={() => handleOpenModalChangeRole(row.userId)}
+                    marginRight="12px"
+                  >
+                    <ChangeCircleOutlinedIcon />
+                    Change Role
+                  </ButtonComponent>
+                  <ButtonComponent
+                    mainColor="#e53935"
+                    backColor="#ef5350"
+                    onClick={() =>
+                      handleOpenConfirmDialog(row.userId, row.roleId)
+                    }
+                  >
+                    <DeleteIcon />
+                    Delete
+                  </ButtonComponent>
+                </Box>
+              ),
+            }))}
             order={order}
             orderBy={orderBy}
             onRequestSort={handleRequestSort}
@@ -461,6 +566,70 @@ const UserManagement = () => {
               onClick={handleSubmitRole}
             >
               Submit
+            </ButtonComponent>
+          </Box>
+        }
+      />
+      <ModalComponent
+        open={openModalChangeRole}
+        handleClose={handleCloseModalChangeRole}
+        title="Change Role"
+        body={
+          <Box
+            p="0px 50px 0px 30px"
+            display="flex"
+            marginBottom="16px"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Typography>Role</Typography>
+            <Select
+              name="role"
+              value={formData.role}
+              onChange={handleInputChange}
+              sx={{ width: "75%" }}
+            >
+              {roles.map((role) => (
+                <MenuItem key={role.roleId} value={role.roleId}>
+                  {role.roleName}
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
+        }
+        footer={
+          <Box textAlign="right">
+            <ButtonComponent
+              mainColor="#2563eb"
+              backColor="#0061FF"
+              onClick={handleSubmitChangeRole}
+            >
+              Submit
+            </ButtonComponent>
+          </Box>
+        }
+      />
+      <AlertComponent
+        open={openConfirmDialog}
+        onClose={handleCloseConfirmDialog}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this item?"
+        buttonComponent={
+          <Box display="flex" justifyContent="flex-end" width="100%">
+            <ButtonComponent
+              mainColor="#616161"
+              backColor="#757575"
+              onClick={handleCloseConfirmDialog}
+            >
+              Cancel
+            </ButtonComponent>
+            <ButtonComponent
+              marginLeft="16px"
+              mainColor="#e53935"
+              backColor="#ef5350"
+              onClick={handleConfirmDelete}
+            >
+              Delete
             </ButtonComponent>
           </Box>
         }

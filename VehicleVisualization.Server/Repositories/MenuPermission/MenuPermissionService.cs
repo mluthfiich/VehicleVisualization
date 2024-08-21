@@ -64,7 +64,7 @@ namespace VehicleVisualization.Server.Repositories.MenuPermission
 			}
 		}
 
-		public async Task<IActionResult> DeleteMenuPermission(string RoleMenuId)
+		public async Task<IActionResult> DeleteMenuPermission(int RoleMenuId)
 		{
 			try
 			{

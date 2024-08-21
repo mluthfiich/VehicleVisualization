@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 // import interceptToken, { startAutoRefresh } from '../../services/interceptToken';
 import axios from "axios";
 
-const Login = () => {
+const Login = ({ onLoginSuccess }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -31,13 +31,14 @@ const Login = () => {
             const response = await axios.post('/api/Auth/Login', { username, password });
     
             const data = response.data;
-            const { token, refreshToken } = data;
+            const { token, refreshToken, userName } = data;
             localStorage.setItem('Bearer ', token);
             localStorage.setItem('RefreshToken', token);
-    
+            localStorage.setItem('Username', userName)
             // startAutoRefresh(refreshToken);
-
+            onLoginSuccess();
             navigate('/Home');
+
         } catch (err) {
             setError('Invalid username or password');
         } finally {

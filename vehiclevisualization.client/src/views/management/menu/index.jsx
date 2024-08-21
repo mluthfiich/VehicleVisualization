@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
 import Main from "../../../components/main/main";
 import "./style.css";
-import { Box, Typography, MenuItem, Select } from "@mui/material";
+import { Box, Typography, MenuItem, Select, Chip } from "@mui/material";
 import axios from "axios";
 import ButtonComponent from "../../../components/button/button";
 import TableComponent from "../../../components/table/table";
 import CardComponent from "../../../components/card/card";
 import AddIcon from "@mui/icons-material/Add";
-import ModalComponent from "../../../components/modal/modal";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ModalComponent from "../../../components/modal/modal";
+import AlertComponent from "../../../components/alert/alert";
 
-const MenuManagement = () => {
+const MenuPermission = () => {
   const [rows, setRows] = useState([]);
   const [roles, setRoles] = useState([]);
   const [menus, setMenus] = useState([]);
@@ -19,78 +20,55 @@ const MenuManagement = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [openModal, setOpenModal] = useState(false);
-  const [formData, setFormData] = useState({
-    role: "",
-    menu: "",
-  });
+  const [formData, setFormData] = useState({ role: "", menu: "" });
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [selectedFid, setSelectedFid] = useState(null);
 
   const columns = [
     { id: "number", label: "No", width: "5%" },
     { id: "menuName", label: "Menu Name", width: "10%" },
     { id: "roleName", label: "Role Name", width: "24%" },
-    {
-      id: "action",
-      label: "Action",
-      width: "10%",
-      render: (row) => (
-        <ButtonComponent mainColor="#e53935" backColor="#ef5350">
-          <DeleteIcon sx={{ mr: 0.5 }} />
-          Delete
-        </ButtonComponent>
-      ),
-    },
+    { id: "action", label: "Action", width: "10%" },
   ];
 
   useEffect(() => {
+    fetchMenuList();
+  }, []);
+
+  const fetchMenuList = () => {
     const token = localStorage.getItem("Bearer ");
 
     axios
       .get("/api/Auth/ListRole", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => {
-        setRoles(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching roles:", error);
-      });
+      .then((response) => setRoles(response.data))
+      .catch((error) => console.error("Error fetching roles:", error));
 
     axios
       .get("/api/MenuPermission/ListMenu", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => {
-        setMenus(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching menus:", error);
-      });
+      .then((response) => setMenus(response.data))
+      .catch((error) => console.error("Error fetching menus:", error));
 
     axios
       .get("/api/MenuPermission/ListRoleMenu", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
         const dataWithIds = response.data.map((row, index) => ({
           ...row,
           id: index,
+          fid: row.fidMenuPermission,
         }));
         setRows(dataWithIds);
       })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []);
+      .catch((error) => console.error("Error fetching data:", error));
+  };
 
   const handleSubmitMenuPermission = () => {
     const token = localStorage.getItem("Bearer ");
-    console.log(formData.role, formData.menu)
     axios
       .post(
         "/api/MenuPermission/AddMenuPermission",
@@ -102,43 +80,101 @@ const MenuManagement = () => {
           },
         }
       )
-      .then((response) => {
-        setOpenModalRole(false);
+      .then(() => {
+        fetchMenuList();
+        setOpenModal(false);
       })
-      .catch((error) => {
+      .catch((error) =>
         console.error(
-          "Error adding role:",
+          "Error adding menu permission:",
           error.response ? error.response.data : error.message
-        );
-      });
+        )
+      );
   };
 
   const handleRequestSort = (property) => {
     const isAscending = orderBy === property && order === "asc";
     setOrder(isAscending ? "desc" : "asc");
     setOrderBy(property);
+    sortData(property, isAscending ? "desc" : "asc");
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const sortData = (property, order) => {
+    const sortedRows = [...rows].sort((a, b) => {
+      if (property === "number") {
+        return order === "asc"
+          ? a[property] - b[property]
+          : b[property] - a[property];
+      } else {
+        const valA = a[property]?.toLowerCase() || "";
+        const valB = b[property]?.toLowerCase() || "";
+        if (valA < valB) return order === "asc" ? -1 : 1;
+        if (valA > valB) return order === "asc" ? 1 : -1;
+        return 0;
+      }
+    });
+    setRows(sortedRows);
   };
+
+  const handleChangePage = (event, newPage) => setPage(newPage);
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
+  const handleOpenModal = () => setOpenModal(true);
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
-  };
+  const handleCloseModal = () => setOpenModal(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
+  };
+
+  const handleOpenConfirmDialog = (fid) => {
+    setSelectedFid(fid);
+    setOpenConfirmDialog(true);
+  };
+
+  const handleCloseConfirmDialog = () => {
+    setOpenConfirmDialog(false);
+    setSelectedFid(null);
+  };
+
+  const handleConfirmDelete = () => {
+    const token = localStorage.getItem("Bearer ");
+    axios
+      .delete("/api/MenuPermission/DeleteMenuPermission", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          fid: selectedFid,
+        },
+      })
+      .then(() => {
+        setRows(rows.filter((row) => row.fid !== selectedFid));
+        handleCloseConfirmDialog();
+      })
+      .catch((error) => {
+        console.error("Error deleting item:", error);
+        handleCloseConfirmDialog();
+      });
+  };
+
+  const getColorFromText = (text) => {
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) {
+      hash = text.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    let color = "#";
+    for (let i = 0; i < 3; i++) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.slice(-2);
+    }
+    return color;
   };
 
   return (
@@ -153,10 +189,41 @@ const MenuManagement = () => {
             <AddIcon sx={{ mr: 0.5 }} />
             Add Menu
           </ButtonComponent>
-
           <TableComponent
             columns={columns}
-            rows={rows}
+            rows={rows.map((row) => ({
+              ...row,
+              menuName: (
+                <Chip
+                  label={row.menuName}
+                  sx={{
+                    backgroundColor: getColorFromText(row.menuName),
+                    color: "#fff",
+                  }}
+                />
+              ),
+              roleName: (
+                <Chip
+                  label={row.roleName}
+                  sx={{
+                    backgroundColor: getColorFromText(row.roleName),
+                    color: "#fff",
+                  }}
+                />
+              ),
+              action: (
+                <Box>
+                  <ButtonComponent
+                    mainColor="#e53935"
+                    backColor="#ef5350"
+                    onClick={() => handleOpenConfirmDialog(row.fid)}
+                  >
+                    <DeleteIcon />
+                    Delete
+                  </ButtonComponent>
+                </Box>
+              ),
+            }))}
             order={order}
             orderBy={orderBy}
             onRequestSort={handleRequestSort}
@@ -220,8 +287,37 @@ const MenuManagement = () => {
         }
         footer={
           <Box textAlign="right">
-            <ButtonComponent mainColor="#2563eb" backColor="#0061FF" onClick={handleSubmitMenuPermission}>
+            <ButtonComponent
+              mainColor="#2563eb"
+              backColor="#0061FF"
+              onClick={handleSubmitMenuPermission}
+            >
               Submit
+            </ButtonComponent>
+          </Box>
+        }
+      />
+      <AlertComponent
+        open={openConfirmDialog}
+        onClose={handleCloseConfirmDialog}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this item?"
+        buttonComponent={
+          <Box display="flex" justifyContent="flex-end" width="100%">
+            <ButtonComponent
+              mainColor="#616161"
+              backColor="#757575"
+              onClick={handleCloseConfirmDialog}
+            >
+              Cancel
+            </ButtonComponent>
+            <ButtonComponent
+              marginLeft="16px"
+              mainColor="#e53935"
+              backColor="#ef5350"
+              onClick={handleConfirmDelete}
+            >
+              Delete
             </ButtonComponent>
           </Box>
         }
@@ -230,4 +326,4 @@ const MenuManagement = () => {
   );
 };
 
-export default MenuManagement;
+export default MenuPermission;

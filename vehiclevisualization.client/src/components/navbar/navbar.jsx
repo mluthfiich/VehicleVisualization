@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AppBar,
   Box,
@@ -26,7 +26,15 @@ const Navbar = ({
   desktopOpen,
 }) => {
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const [username, setUsername] = useState("User");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("Username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -39,11 +47,16 @@ const Navbar = ({
   const handleLogout = () => {
     localStorage.removeItem("Bearer ");
     localStorage.removeItem("RefreshToken");
+    localStorage.removeItem("Username");
     navigate("/login");
   };
 
+  const formatTitle = (title) => {
+    return title.replace(/([A-Z])/g, " $1").trim();
+  };
+  
   const pathname = window.location.pathname;
-  const titleMenu = pathname === "/" ? "Home" : pathname.split("/").pop();
+  const titleMenu = pathname === "/" ? "Home" : formatTitle(pathname.split("/").pop());
 
   return (
     <AppBar
@@ -62,7 +75,7 @@ const Navbar = ({
           aria-label="open drawer"
           edge="start"
           onClick={handleDrawerToggleDesktop}
-          sx={{ mt:0.5, mr: 2, display: { sm: "block", xs: "none" } }}
+          sx={{ mt: 0.5, mr: 2, display: { sm: "block", xs: "none" } }}
         >
           {desktopOpen ? <MenuIcon /> : <ClearIcon />}
         </IconButton>
@@ -103,7 +116,7 @@ const Navbar = ({
                     alignItems: "center",
                   }}
                 >
-                  User
+                  {username}
                   <ExpandMoreIcon sx={{ fontSize: 13, ml: 1.2 }} />
                 </Typography>
               </Box>

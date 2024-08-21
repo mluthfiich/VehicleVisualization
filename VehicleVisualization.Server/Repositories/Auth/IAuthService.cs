@@ -14,7 +14,7 @@ namespace VehicleVisualization.Server.Repositories.Auth
 		Task<List<UserModel>> GetListUser();
 		Task<List<RoleModel>> GetListRole();
 		Task<List<UserManagementModel>> GetListUserRole();
-		Task<IActionResult> DeleteAccount(UserRoleModel model);
+		Task<bool> DeleteAccount(UserRoleModel model);
 		Task<IActionResult> UpdateAccount(UserRoleModel model);
 	}
 }

@@ -77,7 +77,8 @@ namespace VehicleVisualization.Server.Repositories.Auth
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
 					expired = DateTime.Now.AddMinutes(double.Parse(_configuration["Jwt:ExpiryMinutes"])),
-					refreshToken
+					refreshToken,
+					user.UserName
 				});
             }
 
@@ -223,16 +224,17 @@ namespace VehicleVisualization.Server.Repositories.Auth
 			return listUsers;
 		}
 
-		public async Task<IActionResult> DeleteAccount(UserRoleModel model)
+		public async Task<bool> DeleteAccount(UserRoleModel model)
 		{
 			try
 			{
-				var result = await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC spDeleteDataUser {model.Username}, {model.Role}");
-				return new OkObjectResult(new { message = "Menu Permission deleted successfully" });
+				int result = await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC spDeleteDataUser {model.Username}, {model.Role}");
+
+				return result > 0;
 			}
 			catch (Exception ex)
 			{
-				return new BadRequestObjectResult(ex);
+				return false;
 			}
 		}
 
@@ -241,7 +243,7 @@ namespace VehicleVisualization.Server.Repositories.Auth
 			try
 			{
 				var result = await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC spUpdateDataUserRole {model.Username}, {model.Role}");
-				return new OkObjectResult(new { message = "Menu Permission deleted successfully" });
+				return new OkObjectResult(new { message = "Role change successfully" });
 			}
 			catch (Exception ex)
 			{

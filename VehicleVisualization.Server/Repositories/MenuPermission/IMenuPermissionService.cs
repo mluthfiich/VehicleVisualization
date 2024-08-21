@@ -11,7 +11,7 @@ namespace VehicleVisualization.Server.Repositories.MenuPermission
 		Task<List<MenuManagementModel>> GetDataRoleMenu();
 		Task<List<MenuModel>> GetListMenu();
 		Task<IActionResult> AddMenuPermission(MenuPermissionRequestModel model);
-		Task<IActionResult> DeleteMenuPermission(string RoleMenuId);
+		Task<IActionResult> DeleteMenuPermission(int RoleMenuId);
 		Task<IActionResult> UpdateMenuPermission(UpdateMenuPermissionModel model);
 	}
 }

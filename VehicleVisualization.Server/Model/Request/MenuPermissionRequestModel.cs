@@ -10,6 +10,12 @@ namespace VehicleVisualization.Server.Model.Request
 	}
 
 	[Keyless]
+	public class DeleteMenuPermissionModel
+	{
+		public int Fid { get; set; }
+	}
+
+	[Keyless]
 	public class UpdateMenuPermissionModel
 	{
 		public string? Fid { get; set; }

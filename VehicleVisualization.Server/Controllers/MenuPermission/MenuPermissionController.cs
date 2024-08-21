@@ -60,9 +60,9 @@ namespace VehicleVisualization.Server.Controllers.MenuPermission
 
 		[HttpDelete("DeleteMenuPermission")]
 		[Authorize]
-		public async Task<IActionResult> DeleteMenuPermission([FromBody] string RoleMenuId)
+		public async Task<IActionResult> DeleteMenuPermission([FromBody] DeleteMenuPermissionModel model)
 		{
-			var result = await _menuPermissionService.DeleteMenuPermission(RoleMenuId);
+			var result = await _menuPermissionService.DeleteMenuPermission(model.Fid);
 
 			return Ok(result);
 		}
