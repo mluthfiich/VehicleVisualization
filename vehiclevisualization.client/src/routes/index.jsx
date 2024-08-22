@@ -78,7 +78,6 @@ function Router() {
           <AuthRouted>
             <Routes>
               <Route path="/" element={<Main />} />
-              <Route path="/home" element={<Main />} />
               {filteredMenuData.map((menu) => {
                 const Component = components[menu.actionName];
                 return (

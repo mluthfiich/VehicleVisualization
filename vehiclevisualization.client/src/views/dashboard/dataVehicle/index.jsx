@@ -19,11 +19,12 @@ const DataVehicle = () => {
   const columns = [
     { id: "number", label: "No", width: "5%" },
     { id: "year", label: "Year", width: "10%" },
-    { id: "province", label: "Province", width: "24%" },
-    { id: "bus", label: "Car", width: "15%" },
-    { id: "motorCycle", label: "Motor Cycle", width: "15%" },
-    { id: "truck", label: "Truck", width: "15%" },
-    { id: "totalUnit", label: "Total Unit", width: "16%" },
+    { id: "province", label: "Province", width: "28%" },
+    { id: "bus", label: "Bus", width: "10%" },
+    { id: "car", label: "Car", width: "10%" },
+    { id: "motorCycle", label: "Motor Cycle", width: "10%" },
+    { id: "truck", label: "Truck", width: "10%" },
+    { id: "totalUnit", label: "Total Unit", width: "15%" },
   ];
 
   useEffect(() => {

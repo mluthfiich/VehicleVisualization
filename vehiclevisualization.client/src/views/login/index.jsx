@@ -37,7 +37,7 @@ const Login = ({ onLoginSuccess }) => {
             localStorage.setItem('Username', userName)
             // startAutoRefresh(refreshToken);
             onLoginSuccess();
-            navigate('/Home');
+            navigate('/Analytic');
 
         } catch (err) {
             setError('Invalid username or password');

@@ -124,7 +124,7 @@ const Sidebar = () => {
             color: "#3b82f6",
             cursor: "pointer",
           }}
-          onClick={() => navigate("/Home")}
+          onClick={() => navigate("/Analytic")}
         >
           VOIVI
         </Typography>
@@ -159,7 +159,17 @@ const Sidebar = () => {
                     onClick={() =>
                       handleClick(subMenu.name, subMenu.actionName)
                     }
-                    sx={{ backgroundColor: selectedSubMenu === subMenu.actionName ? "rgba(29, 32, 37, 0.06)" : "inherit", cursor: "pointer"}}
+                    sx={{
+                      backgroundColor:
+                        selectedSubMenu === subMenu.actionName
+                          ? "rgba(29, 32, 37, 0.06)"
+                          : "inherit",
+                        borderLeft:
+                          selectedSubMenu === subMenu.actionName
+                            ? "5px solid #3b82f6"
+                            : "none",
+                      cursor: "pointer",
+                    }}
                   >
                     <ListItemText
                       primaryTypographyProps={{

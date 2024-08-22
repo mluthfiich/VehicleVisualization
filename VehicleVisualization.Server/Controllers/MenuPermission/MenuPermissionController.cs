@@ -24,12 +24,14 @@ namespace VehicleVisualization.Server.Controllers.MenuPermission
         [Authorize]
         public async Task<IActionResult> GetMenuItems()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var user = await _userManager.FindByNameAsync(userId);
+			var roles = await _userManager.GetRolesAsync(user);
+			var userRole = roles.First();
+			var menuItems = await _menuPermissionService.GetMenuItems(userRole);
 
-            var menuItems = await _menuPermissionService.GetMenuItems(userId);
-
-            return Ok(menuItems);
-        }
+			return Ok(menuItems);
+		}
 
 		[HttpGet("ListMenu")]
 		[Authorize]

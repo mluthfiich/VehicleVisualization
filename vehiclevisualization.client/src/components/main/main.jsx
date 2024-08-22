@@ -77,7 +77,7 @@ function Main({ children }) {
           transition: "margin-left 0.3s, width 0.3s ease",
           marginLeft: { sm: 0 },
           backgroundColor: "#f7f9fc",
-          height: "100vh",
+          height: "100%",
           width: { sm: desktopOpen ? `calc(100% - ${drawerWidth}px)` : "100%" },
         }}
       >
