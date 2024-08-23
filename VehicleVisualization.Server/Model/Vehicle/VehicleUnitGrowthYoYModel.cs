@@ -6,6 +6,7 @@ namespace VehicleVisualization.Server.Model.Vehicle
     public class VehicleUnitGrowthYoYModel
     {
         public string? Year { get; set; }
+        public string? Province { get; set; }
         public long? BusYear { get; set; }
         public long? CarYear { get; set; }
         public long? MotorCycleYear { get; set; }

@@ -19,6 +19,7 @@ import ReactApexCharts from "react-apexcharts";
 
 const Analytic = () => {
   const [selectedYear, setSelectedYear] = useState(2022);
+  const [selectedProvince, setSelectedProvince] = useState(" ALL PROVINCE");
   const [vehicleData, setVehicleData] = useState([]);
 
   useEffect(() => {
@@ -45,11 +46,20 @@ const Analytic = () => {
     setSelectedYear(event.target.value);
   };
 
-  const getVehicleDataForYear = (year) => {
-    return vehicleData.find((data) => data.year === year.toString());
+  const handleProvinceChange = (event) => {
+    setSelectedProvince(event.target.value);
   };
 
-  const selectedVehicleData = getVehicleDataForYear(selectedYear);
+  const getVehicleDataForYearAndProvince = (year, province) => {
+    return vehicleData.find(
+      (data) => data.year === year.toString() && data.province === province
+    );
+  };
+  
+  const selectedVehicleData = getVehicleDataForYearAndProvince(
+    selectedYear,
+    selectedProvince
+  );
 
   const PieChartOption = {
     chart: {
@@ -84,19 +94,27 @@ const Analytic = () => {
     series: [
       {
         name: "Bus",
-        data: vehicleData.map((data) => data.busYear),
+        data: vehicleData
+          .filter((data) => data.province === selectedProvince)
+          .map((data) => data.busYear),
       },
       {
         name: "Car",
-        data: vehicleData.map((data) => data.carYear),
+        data: vehicleData
+          .filter((data) => data.province === selectedProvince)
+          .map((data) => data.carYear),
       },
       {
         name: "Motorcycle",
-        data: vehicleData.map((data) => data.motorCycleYear),
+        data: vehicleData
+          .filter((data) => data.province === selectedProvince)
+          .map((data) => data.motorCycleYear),
       },
       {
         name: "Truck",
-        data: vehicleData.map((data) => data.truckYear),
+        data: vehicleData
+          .filter((data) => data.province === selectedProvince)
+          .map((data) => data.truckYear),
       },
     ],
     chart: {
@@ -125,8 +143,8 @@ const Analytic = () => {
       align: "center",
       style: {
         fontSize: "24px",
-        fontWeight: "bold"
-      }
+        fontWeight: "bold",
+      },
     },
     plotOptions: {
       bar: {
@@ -146,7 +164,9 @@ const Analytic = () => {
       },
     },
     xaxis: {
-      categories: vehicleData.map((data) => data.year),
+      categories: vehicleData
+        .filter((data) => data.province === selectedProvince)
+        .map((data) => data.year),
     },
     yaxis: {
       labels: {
@@ -162,23 +182,31 @@ const Analytic = () => {
     },
   };
 
-  var lineChartOptions = {
+  const lineChartOptions = {
     series: [
       {
         name: "Bus",
-        data: vehicleData.map((data) => data.busYoY),
+        data: vehicleData
+          .filter((data) => data.province === selectedProvince)
+          .map((data) => data.busYoY),
       },
       {
         name: "Car",
-        data: vehicleData.map((data) => data.carYoY),
+        data: vehicleData
+          .filter((data) => data.province === selectedProvince)
+          .map((data) => data.carYoY),
       },
       {
         name: "Motorcycle",
-        data: vehicleData.map((data) => data.motorCycleYoY),
+        data: vehicleData
+          .filter((data) => data.province === selectedProvince)
+          .map((data) => data.motorCycleYoY),
       },
       {
         name: "Truck",
-        data: vehicleData.map((data) => data.truckYoY),
+        data: vehicleData
+          .filter((data) => data.province === selectedProvince)
+          .map((data) => data.truckYoY),
       },
     ],
     chart: {
@@ -187,8 +215,6 @@ const Analytic = () => {
       zoom: {
         enabled: false,
       },
-    },
-    chart: {
       toolbar: {
         show: false,
       },
@@ -197,7 +223,7 @@ const Analytic = () => {
       enabled: false,
     },
     stroke: {
-      curve: 'smooth'
+      curve: "smooth",
     },
     colors: ["#1e88e5", "#43a047", "#ff1744", "#651fff"],
     markers: {
@@ -206,28 +232,21 @@ const Analytic = () => {
       strokeWidth: 2,
       hover: {
         size: 7,
-      }
+      },
     },
     title: {
       text: "Vehicle Unit Growth YoY %",
       align: "center",
       style: {
         fontSize: "24px",
-        fontWeight: "bold"
-      }
+        fontWeight: "bold",
+      },
     },
     xaxis: {
-      categories: [
-        "2015",
-        "2016",
-        "2017",
-        "2018",
-        "2019",
-        "2020",
-        "2021",
-        "2022",
-      ],
-    }
+      categories: vehicleData
+        .filter((data) => data.province === selectedProvince)
+        .map((data) => data.year),
+    },
   };
 
   return (
@@ -249,6 +268,34 @@ const Analytic = () => {
             ))}
           </Select>
         </FormControl>
+        {vehicleData.length > 0 && (
+          <FormControl
+            sx={{ width: "20%", backgroundColor: "#fff", marginLeft: 2 }}
+          >
+            <InputLabel id="province-select-label">Province</InputLabel>
+            <Select
+              labelId="province-select-label"
+              id="province-select"
+              value={selectedProvince}
+              label="Province"
+              onChange={handleProvinceChange}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    maxHeight: 350,
+                    overflowY: "auto",
+                  },
+                },
+              }}
+            >
+              {vehicleData.slice(0, 35).map((data, index) => (
+                <MenuItem key={index} value={data.province}>
+                  {data.province}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
       </Box>
       {selectedVehicleData && (
         <Box sx={{ display: "flex", width: "100%", mt: 2 }}>
@@ -397,7 +444,7 @@ const Analytic = () => {
             options={PieChartOption}
             series={PieChartSeries}
             type="pie"
-            height={390}
+            height={350}
           />
         </CardComponent>
       </Box>

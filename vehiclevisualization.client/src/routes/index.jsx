@@ -8,7 +8,7 @@ import Unauthorized from '../views/Unauthorized';
 import UserManagement from '../views/management/user';
 import MenuPermission from '../views/management/menu';
 import DataVehicle from '../views/dashboard/dataVehicle';
-import Analytic from '../views/dashboard/analytic';
+import Analytics from '../views/dashboard/analytic';
 
 function useMenuData() {
   const [menuData, setMenuData] = useState([]);
@@ -45,7 +45,7 @@ function useMenuData() {
 }
 
 const components = {
-  'Analytic': Analytic,
+  'Analytics': Analytics,
   'DataVehicle': DataVehicle,
   'UserManagement': UserManagement,
   'MenuPermission': MenuPermission
