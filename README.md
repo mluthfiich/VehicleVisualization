@@ -29,7 +29,7 @@ VehicleVisualization is a powerful tool designed to help users manage and visual
 
 ### Prerequisites
 - .NET SDK 8.0
-- Node.js (version 21.x or later)
+- Node.js (version 20.x or later)
 - SQL Server (optional for local development)
 - Visual Studio or any other code editor
 
